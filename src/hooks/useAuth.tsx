@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from "react";
+import { useCallback, createContext, useContext, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 
@@ -20,46 +20,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<UserRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      handleAuthChange(session);
-    };
-
-    initializeAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        handleAuthChange(session);
-      }
-    );
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [supabase]);
-
-  const handleAuthChange = async (session: Session | null) => {
-    setSession(session);
-    const currentUser = session?.user ?? null;
-    setUser(currentUser);
-
-    if (currentUser) {
-      // Ensure profile exists in public.profiles table
-      await ensureProfile(currentUser);
-      
-      const userRole = (currentUser.user_metadata?.role as UserRole) || 'student';
-      setRole(userRole);
-    } else {
-      setRole(null);
-    }
-    
-    setIsLoading(false);
-  };
-
-  const ensureProfile = async (user: User) => {
+  const ensureProfile = useCallback(async (user: User) => {
     try {
       const { data: existing, error: fetchError } = await supabase
         .from('profiles')
@@ -83,7 +46,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (err) {
       console.error("Critical error in ensureProfile:", err);
     }
-  };
+  }, [supabase]);
+
+  const handleAuthChange = useCallback(async (session: Session | null) => {
+    setSession(session);
+    const currentUser = session?.user ?? null;
+    setUser(currentUser);
+
+    if (currentUser) {
+      // Ensure profile exists in public.profiles table
+      await ensureProfile(currentUser);
+      
+      const userRole = (currentUser.user_metadata?.role as UserRole) || 'student';
+      setRole(userRole);
+    } else {
+      setRole(null);
+    }
+    
+    setIsLoading(false);
+  }, [ensureProfile]);
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      handleAuthChange(session);
+    };
+
+    initializeAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        handleAuthChange(session);
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [handleAuthChange, supabase]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
