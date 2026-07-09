@@ -6,4 +6,5 @@ export const QUERY_KEYS = {
   NOTIFICATIONS: 'notifications',
   CITIES: 'cities',
   SCHOLARSHIPS: 'scholarships',
+  IMPORT_HISTORY: 'import-history',
 } as const;

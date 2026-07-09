@@ -5,3 +5,4 @@ export * from './task/task.service';
 export * from './city/city.service';
 export * from './scholarship/scholarship.service';
 export * from './notification/notification.service';
+export * from './university/import-engine';
