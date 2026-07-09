@@ -65,8 +65,8 @@ export const JourneyProvider = ({ children }: { children: React.ReactNode }) => 
     return (completedCount / tasks.length) * 100;
   }, [tasks]);
 
-  const toggleBookmark = (id: string) => {
-    console.log("Toggle bookmark", id);
+  const toggleBookmark = (_id: string) => {
+    // Bookmark persistence will be wired through the service layer when available.
   };
 
   const isLoading = isProfileLoading || isTasksLoading;

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { UniversityService } from "@/services";
+import { UniversityService, UniversitySearchFilters } from "@/services";
 import { University } from "@/types/database";
 import { Search, MapPin, Star, ArrowRight, Bookmark, Sparkles } from "lucide-react";
 import { PremiumCard, MagneticButton } from "@/components/ui/PremiumComponents";
@@ -15,18 +15,27 @@ export const UniversitySearch = () => {
   const [query, setQuery] = useState("");
   const budgetValue = ('budget' in user ? user.budget : 0) || 30000;
   const [priceRange, setPriceRange] = useState(budgetValue);
+  const [degree, setDegree] = useState("");
+  const [language, setLanguage] = useState("");
+  const [applicationStatus, setApplicationStatus] = useState("");
+  const [scholarshipOnly, setScholarshipOnly] = useState(false);
+
+  const filters = useMemo<UniversitySearchFilters>(() => ({
+    query,
+    degree: degree || undefined,
+    language: (language || undefined) as UniversitySearchFilters["language"],
+    maxTuition: priceRange,
+    scholarshipAvailable: scholarshipOnly || undefined,
+    applicationStatus: (applicationStatus || undefined) as UniversitySearchFilters["applicationStatus"],
+    maxRanking: 2000,
+  }), [applicationStatus, degree, language, priceRange, query, scholarshipOnly]);
 
   const { data: universities = [] } = useQuery({
-    queryKey: [QUERY_KEYS.UNIVERSITIES],
-    queryFn: () => UniversityService.getAll(),
+    queryKey: [QUERY_KEYS.UNIVERSITIES, filters],
+    queryFn: () => UniversityService.getAll(filters),
   });
 
-  const filteredUnis = useMemo(() => {
-    return universities.filter(uni => 
-      (uni.name.toLowerCase().includes(query.toLowerCase()) || uni.city?.name.toLowerCase().includes(query.toLowerCase())) &&
-      (uni.ranking_global || 0) <= 2000
-    );
-  }, [query, universities]);
+  const filteredUnis = universities;
 
   return (
     <div id="universities" className="w-full space-y-16">
@@ -44,7 +53,7 @@ export const UniversitySearch = () => {
         </p>
       </div>
 
-      <div className="relative max-w-4xl mx-auto">
+      <div className="relative max-w-5xl mx-auto">
         <div className="absolute -inset-1 bg-primary/20 blur-2xl rounded-full opacity-0 hover:opacity-100 transition-opacity duration-700" />
         <div className="relative glass p-2 rounded-full border-white/10 shadow-2xl flex items-center gap-4">
           <div className="flex-1 flex items-center px-8">
@@ -72,6 +81,34 @@ export const UniversitySearch = () => {
         </div>
       </div>
 
+      <div className="mx-auto grid max-w-5xl gap-3 md:grid-cols-5">
+        <select value={degree} onChange={(e) => setDegree(e.target.value)} className="rounded-2xl border border-white/10 bg-background/80 p-3 text-sm font-bold outline-none">
+          <option value="">All degrees</option>
+          <option value="Associate">Associate</option>
+          <option value="Bachelor">Bachelor</option>
+          <option value="Master">Master</option>
+          <option value="PhD">PhD</option>
+          <option value="Medicine">Medicine</option>
+        </select>
+        <select value={language} onChange={(e) => setLanguage(e.target.value)} className="rounded-2xl border border-white/10 bg-background/80 p-3 text-sm font-bold outline-none">
+          <option value="">All languages</option>
+          <option value="English">English</option>
+          <option value="Turkish">Turkish</option>
+          <option value="Mixed">Mixed</option>
+        </select>
+        <select value={applicationStatus} onChange={(e) => setApplicationStatus(e.target.value)} className="rounded-2xl border border-white/10 bg-background/80 p-3 text-sm font-bold outline-none">
+          <option value="">Any status</option>
+          <option value="open">Open</option>
+          <option value="opening_soon">Opening soon</option>
+          <option value="rolling">Rolling</option>
+          <option value="closed">Closed</option>
+        </select>
+        <label className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-background/80 p-3 text-sm font-bold">
+          <input type="checkbox" checked={scholarshipOnly} onChange={(e) => setScholarshipOnly(e.target.checked)} /> Scholarship
+        </label>
+        <button onClick={() => { setDegree(""); setLanguage(""); setApplicationStatus(""); setScholarshipOnly(false); setQuery(""); }} className="rounded-2xl border border-white/10 p-3 text-sm font-black">Reset filters</button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
         <AnimatePresence mode="popLayout">
           {filteredUnis.map((uni, i) => (
@@ -97,7 +134,7 @@ export const UniversitySearch = () => {
           <p className="text-muted max-w-sm mx-auto leading-relaxed">
             نگران نباش، گاهی اوقات تغییر کوچیک در بودجه یا انتخاب شهر، درهای جدیدی رو باز می‌کنه.
           </p>
-          <button onClick={() => { setQuery(""); setPriceRange(30000); }} className="mt-8 text-primary font-bold underline">نمایش مجدد همه گزینه‌ها</button>
+          <button onClick={() => { setQuery(""); setPriceRange(30000); setDegree(""); setLanguage(""); setApplicationStatus(""); setScholarshipOnly(false); }} className="mt-8 text-primary font-bold underline">نمایش مجدد همه گزینه‌ها</button>
         </motion.div>
       )}
     </div>

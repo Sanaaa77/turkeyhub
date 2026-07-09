@@ -143,3 +143,291 @@ export interface StudentLessonCompletion { id:string; profile_id:string; lesson_
 export interface AcademyProgress { profile_id:string; daily_goal_minutes:number; weekly_goal_lessons:number; current_streak:number; longest_streak:number; total_xp:number; level:number; english_level:string; turkish_level:string; language_readiness:number; overall_readiness:number; last_lesson_id:string|null; updated_at:string; }
 export interface AcademyMission { id:string; title:string; cadence:"daily"|"weekly"; target:number; progress:number; xp_reward:number; completed:boolean; }
 export interface AcademyDashboard { progress:AcademyProgress; courses:AcademyCourse[]; modules:AcademyModule[]; lessons:AcademyLesson[]; recentCompletions:StudentLessonCompletion[]; achievements:AcademyAchievement[]; missions:AcademyMission[]; todayLesson:AcademyLesson; readinessGainToday:number; coachRecommendation:string; dreamUniversityProgress:number; weeklyCompleted:number; }
+export type VerificationStatus = "unverified" | "pending" | "verified" | "rejected" | "stale";
+export type PublicationStatus = "draft" | "published" | "archived";
+export type ProgramApplicationStatus = "open" | "closed" | "opening_soon" | "rolling" | "unknown";
+
+export interface SourceMetadata {
+  id: string;
+  source_type: "official_api" | "csv" | "json" | "excel" | "admin_upload" | "website" | "manual";
+  name: string;
+  url: string | null;
+  api_endpoint: string | null;
+  file_url: string | null;
+  reliability_score: number;
+  imported_at: string;
+  last_checked_at: string | null;
+}
+
+export interface KnowledgeQualityFields {
+  verification_status: VerificationStatus;
+  data_completeness_score: number;
+  source_id: string | null;
+  last_updated_at: string;
+  source?: SourceMetadata;
+}
+
+export interface Degree extends KnowledgeQualityFields {
+  id: string;
+  name: string;
+  level: string;
+  sort_order: number;
+}
+
+export interface Campus extends KnowledgeQualityFields {
+  id: string;
+  university_id: string;
+  city_id: string | null;
+  name: string;
+  slug: string;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  description: string | null;
+  image_url: string | null;
+  city?: City;
+}
+
+export interface Faculty extends KnowledgeQualityFields {
+  id: string;
+  university_id: string;
+  campus_id: string | null;
+  name: string;
+  slug: string;
+  description: string | null;
+  website_url: string | null;
+}
+
+export interface TuitionFee extends KnowledgeQualityFields {
+  id: string;
+  university_id: string;
+  program_id: string | null;
+  academic_year: string;
+  student_category: string;
+  amount: number;
+  currency: string;
+  fee_type: "annual" | "semester" | "total" | "credit";
+  notes: string | null;
+}
+
+export interface Requirement extends KnowledgeQualityFields {
+  id: string;
+  university_id: string | null;
+  program_id: string | null;
+  requirement_type?: string;
+  name?: string;
+  description: string;
+  mandatory?: boolean;
+  minimum_value?: string | null;
+}
+
+export interface LanguageRequirement extends KnowledgeQualityFields {
+  id: string;
+  university_id: string | null;
+  program_id: string | null;
+  language: string;
+  test_name: string;
+  minimum_score: string;
+  waiver_rules: string | null;
+}
+
+export interface Intake extends KnowledgeQualityFields {
+  id: string;
+  university_id: string;
+  program_id: string | null;
+  name: string;
+  starts_on: string | null;
+  academic_year: string | null;
+  application_status: ProgramApplicationStatus;
+}
+
+export interface ApplicationDeadline extends KnowledgeQualityFields {
+  id: string;
+  university_id: string;
+  program_id: string | null;
+  intake_id: string | null;
+  deadline_type: string;
+  deadline_at: string;
+  status: ProgramApplicationStatus;
+}
+
+export interface Ranking extends KnowledgeQualityFields {
+  id: string;
+  university_id: string;
+  ranking_body: string;
+  ranking_scope: string | null;
+  rank_value: number | null;
+  rank_band: string | null;
+  subject: string | null;
+  year: number;
+}
+
+export interface Dormitory extends KnowledgeQualityFields {
+  id: string;
+  university_id: string | null;
+  campus_id: string | null;
+  name: string;
+  type: string | null;
+  monthly_cost_min: number | null;
+  monthly_cost_max: number | null;
+  currency: string;
+  capacity: number | null;
+  description: string | null;
+}
+
+export interface LivingCost extends KnowledgeQualityFields {
+  id: string;
+  city_id: string | null;
+  university_id: string | null;
+  category: string;
+  amount_min: number | null;
+  amount_max: number | null;
+  currency: string;
+  period: "monthly" | "annual" | "one_time";
+  notes: string | null;
+}
+
+export interface ExchangeProgram extends KnowledgeQualityFields {
+  id: string;
+  university_id: string;
+  name: string;
+  partner_university: string | null;
+  partner_country: string | null;
+  description: string | null;
+  website_url: string | null;
+}
+
+export interface CareerOutcome extends KnowledgeQualityFields {
+  id: string;
+  university_id: string;
+  program_id: string | null;
+  outcome_type: string;
+  description: string | null;
+  employment_rate: number | null;
+  average_salary: number | null;
+  currency: string | null;
+  top_employers: string[] | null;
+}
+
+export interface ContactInformation extends KnowledgeQualityFields {
+  id: string;
+  university_id: string | null;
+  campus_id: string | null;
+  office_id: string | null;
+  contact_type: string;
+  label: string | null;
+  value: string;
+  is_primary: boolean;
+}
+
+export interface UniversityFaq extends KnowledgeQualityFields {
+  id: string;
+  university_id: string | null;
+  program_id: string | null;
+  question: string;
+  answer: string;
+  category: string | null;
+  sort_order: number;
+}
+
+export interface UniversityMedia {
+  id: string;
+  university_id: string;
+  campus_id: string | null;
+  media_type: "logo" | "brochure" | "campus_image" | "gallery_image" | "video";
+  title: string | null;
+  url: string;
+  alt_text: string | null;
+  sort_order: number;
+  verification_status: VerificationStatus;
+  source_id: string | null;
+  last_updated_at: string;
+}
+
+export interface InternationalOffice extends KnowledgeQualityFields {
+  id: string;
+  university_id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  website_url: string | null;
+  contact_person: string | null;
+}
+
+export interface NamedUniversityContent extends KnowledgeQualityFields {
+  id: string;
+  university_id: string;
+  name: string;
+  description: string | null;
+  website_url: string | null;
+}
+
+export interface UniversityProfile extends University {
+  overview: string | null;
+  history: string | null;
+  video_url: string | null;
+  transportation: string | null;
+  international_students: string | null;
+  student_life: string | null;
+  application_process: string | null;
+  publication_status: PublicationStatus;
+  verification_status: VerificationStatus;
+  data_completeness_score: number;
+  last_updated_at: string;
+  campuses?: Campus[];
+  faculties?: Faculty[];
+  programs?: Program[];
+  rankings?: Ranking[];
+  admission_requirements?: Requirement[];
+  required_documents?: Requirement[];
+  language_requirements?: LanguageRequirement[];
+  application_deadlines?: ApplicationDeadline[];
+  intakes?: Intake[];
+  dormitories?: Dormitory[];
+  living_costs?: LivingCost[];
+  exchange_programs?: ExchangeProgram[];
+  career_outcomes?: CareerOutcome[];
+  international_offices?: InternationalOffice[];
+  contact_information?: ContactInformation[];
+  university_faqs?: UniversityFaq[];
+  university_media?: UniversityMedia[];
+  student_clubs?: NamedUniversityContent[];
+  research_centers?: NamedUniversityContent[];
+}
+
+export interface University {
+  legal_name?: string | null;
+  publication_status?: PublicationStatus;
+  verification_status?: VerificationStatus;
+  data_completeness_score?: number;
+  last_updated_at?: string;
+  programs?: Program[];
+  scholarships?: Scholarship[];
+  rankings?: Ranking[];
+}
+
+export interface Program {
+  slug?: string | null;
+  degree_id?: string | null;
+  faculty_id?: string | null;
+  credits?: number | null;
+  curriculum?: unknown;
+  required_gpa?: number | null;
+  required_ielts?: number | null;
+  required_toefl?: number | null;
+  required_tomer?: string | null;
+  portfolio_required?: boolean;
+  interview_required?: boolean;
+  scholarship_available?: boolean;
+  career_opportunities?: string[] | null;
+  application_status?: ProgramApplicationStatus;
+  verification_status?: VerificationStatus;
+  data_completeness_score?: number;
+  last_updated_at?: string;
+  degree?: Degree;
+  tuition_fees?: TuitionFee[];
+  language_requirements?: LanguageRequirement[];
+  required_documents?: Requirement[];
+  career_outcomes?: CareerOutcome[];
+}
