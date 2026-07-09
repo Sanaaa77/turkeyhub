@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { useJourney } from "@/hooks/useJourney";
 import { JOURNEY_STEPS } from "@/data/userJourney";
 import { ApplicationService, NotificationService } from "@/services";
+import { AcademyDashboardWidgets } from "@/components/academy/AcademyDashboardWidgets";
 
 export default function Dashboard() {
   const { user, progress, currentStep, completeTask, tasks } = useJourney();
@@ -89,6 +90,8 @@ export default function Dashboard() {
             )}
           </PremiumCard>
         </div>
+
+        <AcademyDashboardWidgets />
 
         {/* Dynamic Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

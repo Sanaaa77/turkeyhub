@@ -126,3 +126,20 @@ export interface Notification {
   type: string | null;
   created_at: string;
 }
+
+export type AcademyLanguage = "English" | "Turkish";
+export type AcademyPath = "General English" | "Academic English" | "IELTS Preparation" | "A1" | "A2" | "B1" | "B2" | "C1" | "TÖMER Preparation";
+export type AcademyStatus = "draft" | "published";
+export type LessonComponent = "video" | "reading" | "vocabulary" | "grammar" | "listening" | "speaking" | "writing" | "quiz";
+
+export interface AcademyCourse { id:string; title:string; language:AcademyLanguage; path:AcademyPath; level:string; description:string; status:AcademyStatus; readiness_weight:number; xp_reward:number; estimated_weeks:number; created_at:string; }
+export interface AcademyModule { id:string; course_id:string; title:string; description:string; order_index:number; readiness_focus:string; xp_reward:number; created_at:string; }
+export interface AcademyLesson { id:string; module_id:string; title:string; summary:string; order_index:number; duration_minutes:number; video_url:string|null; reading_content:string; vocabulary_count:number; grammar_focus:string; listening_prompt:string; speaking_prompt:string; writing_prompt:string; xp_reward:number; readiness_gain:number; status:AcademyStatus; created_at:string; }
+export interface AcademyQuiz { id:string; lesson_id:string; title:string; pass_score:number; xp_reward:number; }
+export interface AcademyQuestion { id:string; quiz_id:string; prompt:string; options:string[]; correct_answer:string; explanation:string; }
+export interface AcademyVocabulary { id:string; lesson_id:string; term:string; translation:string; example:string; mastery_level:number; }
+export interface AcademyAchievement { id:string; code:string; title:string; description:string; badge_icon:string; xp_reward:number; }
+export interface StudentLessonCompletion { id:string; profile_id:string; lesson_id:string; score:number; xp_earned:number; readiness_gain:number; completed_at:string; }
+export interface AcademyProgress { profile_id:string; daily_goal_minutes:number; weekly_goal_lessons:number; current_streak:number; longest_streak:number; total_xp:number; level:number; english_level:string; turkish_level:string; language_readiness:number; overall_readiness:number; last_lesson_id:string|null; updated_at:string; }
+export interface AcademyMission { id:string; title:string; cadence:"daily"|"weekly"; target:number; progress:number; xp_reward:number; completed:boolean; }
+export interface AcademyDashboard { progress:AcademyProgress; courses:AcademyCourse[]; modules:AcademyModule[]; lessons:AcademyLesson[]; recentCompletions:StudentLessonCompletion[]; achievements:AcademyAchievement[]; missions:AcademyMission[]; todayLesson:AcademyLesson; readinessGainToday:number; coachRecommendation:string; dreamUniversityProgress:number; weeklyCompleted:number; }
