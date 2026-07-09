@@ -20,7 +20,7 @@ export const SuccessStories = () => {
                    <h4 className="font-black text-xl">{t.name}</h4>
                    <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest">{t.uni}</p>
                 </div>
-                <p className="opacity-70 text-sm leading-relaxed mb-8 italic">"{t.story}"</p>
+                <p className="opacity-70 text-sm leading-relaxed mb-8 italic">«{t.story}»</p>
                 <div className="flex justify-end gap-6 text-[10px] font-black opacity-30">
                   <div className="flex items-center gap-2"><Clock className="w-3 h-3" /> {t.timeline}</div>
                   <div className="flex items-center gap-2"><CheckCircle className="w-3 h-3" /> ویزا تایید</div>
